@@ -1,8 +1,14 @@
 import React from 'react'
 import { CpuChipIcon, BellIcon, UserCircleIcon  } from '@heroicons/react/24/outline'
+import { useNavigate } from 'react-router-dom';
 
 
-function Header() {
+    function Header() {
+  const Navigate = useNavigate()
+  const logout = () => {
+    localStorage.removeItem('adminToken');
+    Navigate("/admin");
+  };
   return (
     <div className='bg-[#b4ffc1] w-full py-6 items-center justify-between flex px-12 shadow-md shadow-[#f2f2f2] '>
       {/* Search */}
@@ -23,7 +29,7 @@ function Header() {
 
       <div className='items-center justify-end space-x-6 flex w-full'>
         <BellIcon className='header-icon'/>
-        <div className='flex gap-2 bg-green-300 py-2 px-3 rounded text-gray-700 font-semibold cursor-pointer'>
+        <div className='flex gap-2 bg-green-300 py-2 px-3 rounded text-gray-700 font-semibold cursor-pointer justify-center items-center' onClick={logout}>
           <UserCircleIcon className='header-icon' /> Logout
         </div>
       </div>

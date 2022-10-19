@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import { EnvelopeIcon, LockClosedIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -27,6 +27,7 @@ function Register() {
       [name] : value
     })
   }
+  
   const registerForm = (e)=>{
     e.preventDefault()
     if(register.name == ''){
@@ -79,6 +80,13 @@ function Register() {
       }).catch(error => console.log(error))
     }
   }
+
+  useEffect(() => {
+    let userData = localStorage.getItem('token')
+    if (userData) {
+      Navigate('/')
+    } else Navigate("/register");
+  }, [Navigate]);
 
   return (
     <div>

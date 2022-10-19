@@ -7,15 +7,15 @@ import { NavLink } from 'react-router-dom';
 
 function Navbar() {
   return (
-    <div className='bg-[#b4ffc1] col-span-2 border-r border-gray-200 min-h-[90vh] w-[80px] xl:w-[250px] pt-8 flex flex-col items-start justify-between'>
+    <div className='bg-[#b4ffc1] col-span-5 border-r border-gray-200 min-h-[90vh] w-[80px] xl:w-[250px] lg:col-span-2 pt-8 flex flex-col items-start justify-between'>
       <div className=' space-y-8 w-full'>
         {
-          navLinks.slice(0, 7).map((link) => <NavItem link={link} key={link.id} />)
+          navLinks.map((link) => <NavItem link={link} key={link.id} />)
         }
-        <div className='w-full border-t border-[#abe2b4]	' />
+        {/* <div className='w-full border-t border-[#abe2b4]	' />
         {
-          navLinks.slice(7, 8).map((link) => <NavItem link={link} key={link.id} />)
-        }
+          navLinks.slice(5, 6).map((link) => <NavItem link={link} key={link.id} />)
+        } */}
       </div>
     </div>
   )

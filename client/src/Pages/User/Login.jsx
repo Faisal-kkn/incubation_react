@@ -1,16 +1,26 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 function Login() {
 
     const Navigate = useNavigate()
+
+    useEffect(() => {
+        let userData = localStorage.getItem('token')
+        if (userData) {
+            Navigate('/')
+        } else Navigate("/login");
+    }, [Navigate]);
+   
     const [logErr, setLogErr] = useState({
         email: true,
         password: true,
         msg: ''
     })
+
     const [login, setLogin] = useState({
         email: '',
         password: ''
@@ -53,16 +63,22 @@ function Login() {
                         msg: 'The password that you entered is incorrect'
                     })
                 } else {
-                    Navigate('/')
-                    setLogErr({
-                        email: true,
-                        password: true,
-                        msg: ''
-                    })
+                    if (response.data.auth){
+                        localStorage.setItem('token', response.data.token)
+                        setLogErr({
+                            email: true,
+                            password: true,
+                            msg: ''
+                        })
+                        Navigate('/')
+                        console.log(response.data);
+                        
+                    } else Navigate('/login')
                 }
             })).catch(error => console.log(error))
         }
     }
+
 
     return (
         <div>
