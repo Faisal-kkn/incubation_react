@@ -82,11 +82,19 @@ function Register() {
   }
 
   useEffect(() => {
-    let userData = localStorage.getItem('token')
-    if (userData) {
-      Navigate('/')
-    } else Navigate("/register");
+    userAuthenticeted()
   }, [Navigate]);
+
+  const userAuthenticeted = () => {
+    axios.get("http://localhost:4000/isUserAuth", {
+      headers: {
+        "x-access-token": localStorage.getItem("token"),
+      },
+    }).then((response) => {
+      if (response.data.auth) Navigate('/')
+      else Navigate("/register");
+    });
+  };
 
   return (
     <div>

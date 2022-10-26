@@ -13,15 +13,24 @@ function Home() {
         phone: '', company_name: '', Incubation: '',
         image: '', status: ''
     });
+
+
     useEffect(() => {
-        let userData = localStorage.getItem('adminToken')
-        if (userData) {
-            Navigate('/admin/home')
-        } else Navigate("/admin/login");
-        axios.get("http://localhost:4000/admin/home").then((response => {
-            if (response) setApplicationList(response.data)
+        userAuthenticeted()
+    }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/admin/home", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((response => {
+            if (response) {
+                setApplicationList(response.data)
+                Navigate('/admin/home')
+            } else Navigate("/admin/login");
         })).catch(error => console.log(error))
-    }, [reducerValue]);
+    };
 
     const fullDetails = (id) => {
         applicationList.filter((list) => {
@@ -36,15 +45,13 @@ function Home() {
         })
     }
     const approveForm = (id) => {
-        axios.post("http://localhost:4000/admin/approve/" + id ).then((result =>{
-            console.log(result.status );
+        axios.post("http://localhost:4000/admin/approve/" + id).then((result => {
             if (result.status === 200) forceUpdate()
-            
+
         }))
     }
     const rejectForm = (id) => {
-        axios.post("http://localhost:4000/admin/reject/"+ id).then((result => {
-            console.log(result.status);
+        axios.post("http://localhost:4000/admin/reject/" + id).then((result => {
             if (result.status === 200) forceUpdate()
         }))
     }

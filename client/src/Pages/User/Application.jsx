@@ -15,12 +15,25 @@ function Application() {
     })
     
     useEffect(() => {
-        let userData = localStorage.getItem('token')
-        if (userData) {
-            setUserName(jwtDecode(localStorage.getItem('token')));
-            Navigate('/')
-        } else Navigate("/login");
+        userAuthenticeted()
     }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/isUserAuth", {
+            headers: {
+                "x-access-token": localStorage.getItem("token"),
+            },
+        }).then((response) => {
+            if (response.data.auth){
+                setUserName(jwtDecode(localStorage.getItem("token")));
+                Navigate('/')
+            }
+            else Navigate("/login");
+        });
+    };
+
+
+
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -33,7 +46,6 @@ function Application() {
             ...application,
             [name]: value,
         })
-        console.log(application);
     }
     const fileUpload = (e)=>{
         setApplication({
@@ -51,7 +63,6 @@ function Application() {
         
         
         axios.post('http://localhost:4000/application', formData).then(response => {
-            console.log(response.data);
                 if (response.data){
                     // const { name, value = '' } = e.target
                     // setApplication({

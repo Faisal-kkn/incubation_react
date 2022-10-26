@@ -6,6 +6,28 @@ const applicationForm = require('../models/user/application')
 const slots = require('../models/user/slots')
 var jwt = require('jsonwebtoken');
 
+
+const verifyAdminJWT = (req, res, next) => {
+    const token = req.headers["x-access-token"];
+    if (!token) {
+        res.send("We need a token, please give it to us next time");
+    } else {
+        jwt.verify(token, "adminToken", (err, decoded) => {
+            if (err) {
+                console.log(err);
+                res.json({ auth: false, message: "you are failed to authenticate" });
+            } else {
+                next();
+            }
+        });
+    }
+};
+
+router.get('/isAdminAuth', verifyAdminJWT, (req, res) => {
+    res.status(200).json({ auth: true, message: "You are authenticated Congrats!" })
+})
+
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
@@ -41,9 +63,10 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.get('/home', async (req, res) => {
+router.get('/home', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.find({ status: "pending" }).then(response => {
+            response.auth = true
             res.status(200).json(response)
         }).catch(error => {
             res.json(error)
@@ -53,7 +76,7 @@ router.get('/home', async (req, res) => {
     }
 })
 
-router.post('/approve/:id', async (req, res) => {
+router.post('/approve/:id', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.findByIdAndUpdate({ _id: req.params.id }, {
             $set: {
@@ -69,7 +92,7 @@ router.post('/approve/:id', async (req, res) => {
     }
 })
 
-router.post('/reject/:id', async (req, res) => {
+router.post('/reject/:id', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.findByIdAndUpdate({ _id: req.params.id }, {
             $set: {
@@ -85,7 +108,7 @@ router.post('/reject/:id', async (req, res) => {
     }
 })
 
-router.get('/approved', async (req, res) => {
+router.get('/approved', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.find({ status: "approved" }).then(response => {
             res.status(200).json(response)
@@ -98,7 +121,7 @@ router.get('/approved', async (req, res) => {
 })
 
 
-router.get('/rejected', async (req, res) => {
+router.get('/rejected', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.find({ status: "rejected" }).then(response => {
             res.status(200).json(response)
@@ -110,7 +133,7 @@ router.get('/rejected', async (req, res) => {
     }
 })
 
-router.get('/booking_slots', async (req, res) => {
+router.get('/booking_slots', verifyAdminJWT, async (req, res) => {
     try {
         slots.find().then(response => {
             res.status(200).json(response)
@@ -122,7 +145,7 @@ router.get('/booking_slots', async (req, res) => {
     }
 })
 
-router.get('/slotBooking', async (req, res) => {
+router.get('/slotBooking', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.findOneAndUpdate({ _id: req.query.companyId }, {
             $set: {
@@ -147,7 +170,7 @@ router.get('/slotBooking', async (req, res) => {
     }
 })
 
-router.get('/progress', async (req, res) => {
+router.get('/progress', verifyAdminJWT, async (req, res) => {
     try {
         applicationForm.find().then(response => {
             res.status(200).json(response)

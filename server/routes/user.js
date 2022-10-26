@@ -18,9 +18,27 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// function authToken(req, res, next){
+const verifyJWT = (req, res, next) => {
+    const token = req.headers["x-access-token"];
+    if (!token) {
+        res.send("We need a token, please give it to us next time");
+    } else {
+        jwt.verify(token, "jwtSecret", (err, decoded) => {
+            if (err) {
+                console.log(err);
+                res.json({ auth: false, message: "you are failed to authenticate" });
+            } else {
+                next();
+            }
+        });
+    }
+};
 
-// }
+router.get('/isUserAuth', verifyJWT, (req, res) => {
+    res.status(200).json({ auth: true, message: "You are authenticated Congrats!" })
+})
+
+
 router.post('/register', async (req, res)=>{
     try{
         let mailId = await registerForm.findOne({ email: req.body.email })
@@ -35,7 +53,8 @@ router.post('/register', async (req, res)=>{
             })
 
             registerUser.save().then(data => {
-                res.json(data)
+                console.log(data);
+                res.json({data:true})
             }).catch(error => {
                 res.json(error)
             })
@@ -47,10 +66,9 @@ router.post('/register', async (req, res)=>{
     }
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login',   async (req, res) => {
     try {
         const { email, password } = req.body 
-        console.log(req.body);
 
         registerForm.findOne({ email: email}).then(response => {
             var mailStatus = true;
@@ -66,16 +84,8 @@ router.post('/login', async (req, res) => {
                     return res.status(200).json({ auth: false, passwordStatus }) 
                 }else{
                     passwordStatus = true;
-                    // response.status = true;
-                    // res.json(response)
-                    let resp = {
-                        id: response._id,
-                        name: response.name
-                    }
-
-                    let token = jwt.sign(resp, process.env.JWT_SECRET, {expiresIn: 300});
+                    let token = jwt.sign({name: response.name}, process.env.JWT_SECRET, {expiresIn: 300});
                     res.status(200).json({ auth: true, token: token, passwordStatus  })
-
                 }
             })
         }).catch(error => {
@@ -86,8 +96,7 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/application', upload.single('image'), (req, res) => {
-    console.log(req.body);
+router.post('/application', verifyJWT,  upload.single('image'), (req, res) => {
     try{
         const application = new applicationForm({
             name: req.body.name,

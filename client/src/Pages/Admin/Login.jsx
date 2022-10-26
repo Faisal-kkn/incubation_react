@@ -7,12 +7,19 @@ function Login() {
     const Navigate = useNavigate()
 
     useEffect(() => {
-        let userData = localStorage.getItem('adminToken')
-        // let userData = false
-        if (userData) {
-            Navigate('/admin/home')
-        } else Navigate("/admin/login");
+        userAuthenticeted()
     }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/admin/isAdminAuth", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((response) => {
+            if (response.data.auth) Navigate('/admin/home')
+            else Navigate("/admin/login");
+        });
+    };
 
     const [logErr, setLogErr] = useState({
         email: true,

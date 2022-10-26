@@ -2,17 +2,25 @@ import React, { useEffect } from 'react'
 import Header from '../../component/Header/Header';
 import Navbar from '../../component/Navbar/Navbar';
 import {Outlet, useNavigate} from 'react-router-dom'
-import jwtDecode from 'jwt-decode'
+import axios from 'axios';
 
 function Admin() {
   const Navigate = useNavigate()
 
   useEffect(() => {
-    let userData = localStorage.getItem('adminToken')
-    if (userData) {
-      Navigate('/admin/home')
-    } else Navigate("/admin/login");
-  }, [Navigate]);
+    userAuthenticeted()
+  }, []);
+
+  const userAuthenticeted = () => {
+    axios.get("http://localhost:4000/admin/isAdminAuth", {
+      headers: {
+        "x-access-token": localStorage.getItem("adminToken"),
+      },
+    }).then((respo) => {
+      if (respo.data.auth) Navigate('/admin/home')
+      else Navigate("/admin/login");
+    });
+  };
 
  
 

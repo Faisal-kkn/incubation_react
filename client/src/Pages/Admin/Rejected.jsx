@@ -13,14 +13,21 @@ function Home() {
     });
 
     useEffect(() => {
-        let userData = localStorage.getItem('adminToken')
-        if (userData) {
-            Navigate('/admin/rejected')
-        } else Navigate("/admin/login")
-        axios.get("http://localhost:4000/admin/rejected").then((response => {
-            if (response) setApplicationList(response.data)
-        })).catch(error => console.log(error))
+        userAuthenticeted()
     }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/admin/rejected", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((response => {
+            if (response) {
+                setApplicationList(response.data)
+                Navigate('/admin/rejected')
+            } else Navigate("/admin/login");
+        })).catch(error => console.log(error))
+    };
 
     const fullDetails = (id) => {
         applicationList.filter((list) => {
@@ -72,7 +79,7 @@ function Home() {
                                             Status
                                         </th>
                                         <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"> </th>
-                                        
+
                                     </tr>
                                 </thead>
 

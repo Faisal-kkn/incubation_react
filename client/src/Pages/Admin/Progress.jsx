@@ -6,18 +6,25 @@ function Home() {
     const Navigate = useNavigate();
 
     const [applicationList, setApplicationList] = useState([]);
-    
-    useEffect(() => {
-        let userData = localStorage.getItem('adminToken')
-        if (userData) Navigate('/admin/progress')
-        else Navigate("/admin/login");
-        axios.get("http://localhost:4000/admin/progress").then((response => {
-            if (response) setApplicationList(response.data)
-            console.log(response.data);
-        })).catch(error => console.log(error))
-    }, []);
 
-    
+    useEffect(() => {
+        userAuthenticeted()
+    }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/admin/progress", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((response => {
+            if (response) {
+                setApplicationList(response.data)
+                Navigate('/admin/progress')
+            } else Navigate("/admin/login");
+        })).catch(error => console.log(error))
+
+    };
+
     return (
         <div>
 
@@ -64,7 +71,7 @@ function Home() {
                                                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap py-4 w-[30%]" >
                                                         <div class="mb-1 text-base font-medium  capitalize dark:text-white"><small>{list.status}</small></div>
                                                         <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                                                            <div class={` h-2.5 rounded-full ${list.status === "approved" ? "w-[75%] bg-blue-600 dark:bg-blue-500" : list.status === "rejected" ? "w-[50%] bg-red-600 dark:bg-red-500" : list.status === "pending" ? "w-[25%] bg-orange-600 dark:bg-orange-500" : list.status === "Booked" ? "w-[100%] bg-green-600 dark:bg-green-500": ''}`}></div>
+                                                            <div class={` h-2.5 rounded-full ${list.status === "approved" ? "w-[75%] bg-blue-600 dark:bg-blue-500" : list.status === "rejected" ? "w-[50%] bg-red-600 dark:bg-red-500" : list.status === "pending" ? "w-[25%] bg-orange-600 dark:bg-orange-500" : list.status === "Booked" ? "w-[100%] bg-green-600 dark:bg-green-500" : ''}`}></div>
                                                         </div>
                                                     </td>
                                                 </tr>

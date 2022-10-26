@@ -14,18 +14,28 @@ function Home() {
     });
 
     useEffect(() => {
-        let userData = localStorage.getItem('adminToken')
-        if (userData) {
-            Navigate('/admin/booking_slots')
-        } else Navigate("/admin/login")
-        axios.get("http://localhost:4000/admin/booking_slots").then((response => {
-            if (response) setSloatBooking(response.data)
-        })).catch(error => console.log(error))
+        userAuthenticeted()
+    }, [Navigate]);
 
-        axios.get("http://localhost:4000/admin/approved").then((response => {
-            if (response) setApplicationList(response.data)
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/admin/booking_slots", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((response => {
+            if (response) {
+                setSloatBooking(response.data)
+                Navigate('/admin/booking_slots')
+            } else Navigate("/admin/login");
         })).catch(error => console.log(error))
-    }, [Navigate, reducerValue]);
+        axios.get("http://localhost:4000/admin/approved").then((response => {
+            if (response) {
+                setApplicationList(response.data)
+                Navigate('/admin/booking_slots')
+            } else Navigate("/admin/login");
+        })).catch(error => console.log(error))
+    };
+
 
     const fullDetails = (sloatNo) => {
         setSelected({
@@ -34,12 +44,12 @@ function Home() {
         })
         setShowModal(true)
     }
-    const bookSloat = ()=>{
+    const bookSloat = () => {
         axios.get(`http://localhost:4000/admin/slotBooking?slotId=${selected.index}&companyId=${selected.id}`).then((response => {
             forceUpdate()
             setShowModal(false)
         })).catch(error => console.log(error))
-        
+
     }
     return (
         <div>
@@ -48,13 +58,13 @@ function Home() {
                 <div className="w-full">
                     <div className="relative grid p-5 grid-cols-7 text-center gap-5 min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
                         {
-                            sloatBooking.map((items)=>{
-                                return(
-                                    <div className={`h-[150px] p-4 hover:cursor-pointer flex items-center justify-center  ${items.status ? "bg-gray-300" : "bg-green-300"}`} onClick={() => items.status ? alert("This sloat is Already Booked"): fullDetails(items.sloatNo)}>{items.sloatNo}</div>
-                                ) 
+                            sloatBooking.map((items) => {
+                                return (
+                                    <div className={`h-[150px] p-4 hover:cursor-pointer flex items-center justify-center  ${items.status ? "bg-gray-300" : "bg-green-300"}`} onClick={() => items.status ? alert("This sloat is Already Booked") : fullDetails(items.sloatNo)}>{items.sloatNo}</div>
+                                )
                             })
                         }
-                        
+
                     </div>
                 </div>
             </section>
@@ -82,14 +92,16 @@ function Home() {
                                 </div>
                                 {/*body*/}
                                 <div className="relative p-6 flex justify-center">
-                                    <select label="Select Version border-solid border-2 border-gray " onChange={(e) => { setSelected({
-                                        ...selected,
-                                        id: e.target.value,
-                                    }) }}>
+                                    <select label="Select Version border-solid border-2 border-gray " onChange={(e) => {
+                                        setSelected({
+                                            ...selected,
+                                            id: e.target.value,
+                                        })
+                                    }}>
                                         <option hidden selected>Select</option>
                                         {
-                                            applicationList.map((iteams, index)=>{
-                                                return(
+                                            applicationList.map((iteams, index) => {
+                                                return (
                                                     <option value={iteams._id} >{iteams.company_name}</option>
                                                 )
                                             })

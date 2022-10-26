@@ -9,11 +9,21 @@ function Login() {
     const Navigate = useNavigate()
 
     useEffect(() => {
-        let userData = localStorage.getItem('token')
-        if (userData) {
-            Navigate('/')
-        } else Navigate("/login");
+        userAuthenticeted()
     }, [Navigate]);
+
+    const userAuthenticeted = () => {
+        axios.get("http://localhost:4000/isUserAuth", {
+            headers: {
+                "x-access-token": localStorage.getItem("token"),
+            },
+        }).then((response) => {
+            if (response.data.auth) Navigate('/')
+            else Navigate("/login");
+        });
+    };
+
+
    
     const [logErr, setLogErr] = useState({
         email: true,
@@ -64,15 +74,13 @@ function Login() {
                     })
                 } else {
                     if (response.data.auth){
-                        localStorage.setItem('token', response.data.token)
                         setLogErr({
                             email: true,
                             password: true,
                             msg: ''
                         })
+                        localStorage.setItem("token", response.data.token)
                         Navigate('/')
-                        console.log(response.data);
-                        
                     } else Navigate('/login')
                 }
             })).catch(error => console.log(error))
