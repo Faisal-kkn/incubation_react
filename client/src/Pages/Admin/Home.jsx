@@ -25,10 +25,13 @@ function Home() {
                 "x-access-token": localStorage.getItem("adminToken"),
             },
         }).then((response => {
-            if (response) {
+            
+            if (response.data.auth === false) {
+                Navigate("/admin/login");
+            } else {
                 setApplicationList(response.data)
                 Navigate('/admin/home')
-            } else Navigate("/admin/login");
+            }
         })).catch(error => console.log(error))
     };
 

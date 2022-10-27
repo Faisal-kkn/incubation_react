@@ -23,16 +23,24 @@ function Home() {
                 "x-access-token": localStorage.getItem("adminToken"),
             },
         }).then((response => {
-            if (response) {
+            if (response.data.auth === false) {
+                Navigate("/admin/login");
+            } else {
                 setSloatBooking(response.data)
                 Navigate('/admin/booking_slots')
-            } else Navigate("/admin/login");
+            }
         })).catch(error => console.log(error))
-        axios.get("http://localhost:4000/admin/approved").then((response => {
-            if (response) {
-                setApplicationList(response.data)
+        axios.get("http://localhost:4000/admin/approved", {
+            headers: {
+                "x-access-token": localStorage.getItem("adminToken"),
+            },
+        }).then((respons => {
+            if (respons.data.auth === false) {
+                Navigate("/admin/login");
+            } else {
+                setApplicationList(respons.data)
                 Navigate('/admin/booking_slots')
-            } else Navigate("/admin/login");
+            }
         })).catch(error => console.log(error))
     };
 
